@@ -5,9 +5,9 @@ const cors = require('cors');
 app.use(cors());
 
 app.locals.users = [
-  { id: 'u1', name: 'Jessica Candel', username: 'Jessica', password: 'Candel', favorites:[] },
-  { id: 'u2', name: 'Marcus Aurelius', username: 'Marcus', password: 'Aurelius', favorites:[] },
-  { id: 'u3', name: 'Thirdu Ser', username: 'Thirdu', password: 'Ser', favorites:[] }
+  { id: 'u1', name: 'Jessica Candel', username: 'Jessica', password: 'Candel', favorites: [], watched: [] },
+  { id: 'u2', name: 'Marcus Aurelius', username: 'Marcus', password: 'Aurelius', favorites: [], watched: [] },
+  { id: 'u3', name: 'Thirdu Ser', username: 'Thirdu', password: 'Ser', favorites: [], watched: [] }
 ];
 
 app.set('port', process.env.PORT || 3001);
@@ -41,18 +41,27 @@ app.get('/api/v1/users/:id', (request, response) => {
 app.use(express.json());
 
 
-app.patch('/api/v1/users/:id', (request, response) => {
+app.patch('/api/v1/users/:id', (request, response, type) => {
   const { id } = request.params;
-  const newFavorite = request.body;
+  const newFavorite, newWatched;
+  if (type === 'fav') {
+    newFavorite = request.body;
+  } else if (type === 'watched') {
+    newWatched = request.body;
+  }
   const user = app.locals.users.find(user => user.id === id);
   if (!user) {
     return response.sendStatus(404);
   }
 
-  if(!user.favorites.some(fav => fav.id === newFavorite.id)) {
+  if (newFavorite && !user.favorites.some(fav => fav.id === newFavorite.id)) {
    user.favorites.push(newFavorite)
-  } else {
+  } else if (newFavorite){
     user.favorites = user.favorites.filter(fav => fav.id !== newFavorite.id)
+  } else if (newWatched && !user.watched.some(watched => watched.id === newWatched.id)) {
+    user.watched.push(newWatched)
+  } else {
+    user.watched = user.watched.filter(watched => watched.id !== newWated.id)
   }
   response.status(201).json(user.favorites);
 });
