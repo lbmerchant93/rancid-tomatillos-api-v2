@@ -43,7 +43,7 @@ app.use(express.json());
 
 app.patch('/api/v1/users/:id', (request, response, type) => {
   const { id } = request.params;
-  const newFavorite, newWatched;
+  let newFavorite, newWatched;
   if (type === 'fav') {
     newFavorite = request.body;
   } else if (type === 'watched') {
