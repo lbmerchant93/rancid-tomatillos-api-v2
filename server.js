@@ -41,7 +41,7 @@ app.get('/api/v1/users/:id', (request, response) => {
 app.use(express.json());
 
 
-app.patch('/api/v1/users/:id', (request, response) => {
+app.patch('/api/v1/users/favorites/:id', (request, response) => {
   const { id } = request.params;
   const newFavorite = request.body;
   const user = app.locals.users.find(user => user.id === id);
@@ -55,4 +55,20 @@ app.patch('/api/v1/users/:id', (request, response) => {
     user.favorites = user.favorites.filter(fav => fav.id !== newFavorite.id)
   }
   response.status(201).json(user.favorites);
+});
+
+app.patch('/api/v1/users/watched/:id', (request, response) => {
+  const { id } = request.params;
+  const newWatched = request.body;
+  const user = app.locals.users.find(user => user.id === id);
+  if (!user) {
+    return response.sendStatus(404);
+  }
+
+  if(!user.watched.some(watch => watch.id === newWatched.id)) {
+   user.watched.push(newWatched)
+  } else {
+    user.watched = user.watched.filter(watch => watch.id !== newWatched.id)
+  }
+  response.status(201).json(user.watched);
 });
